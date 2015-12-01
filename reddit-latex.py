@@ -59,9 +59,13 @@ class ThreadFormatter:
         if len(comments) == 0:
             return ""
         thread = "\\begin{mdframed}\n"
-        for i in range(len(comments)):
-            thread += self.format_comment(comments[i])
-            discussion = self.format_thread(comments[i].replies)
+        for comment in comments:
+            if type(comment) == "MoreComments":
+                # more comments, but don't bother printing them
+                #  (all interesting comments should have previously been ordered/loaded)
+                continue
+            thread += self.format_comment(comment)
+            discussion = self.format_thread(comment.replies)
             thread += discussion
         thread += "\\end{mdframed}\n"
         return thread
@@ -71,6 +75,7 @@ class ThreadFormatter:
 
     def download_page(self, url):
         submission = self.r.get_submission(url=url)
+        submission.replace_more_comments(limit=None, threshold=0)
         question = submission.selftext
         print(question)
         print(self.format_thread(submission.comments))
@@ -93,4 +98,5 @@ formatter = ThreadFormatter()
 formatter.print_header()
 formatter.download_page("https://www.reddit.com/r/LaTeX/comments/3umdyg/latex_formatting_of_reddit_posts/")
 formatter.download_page("https://www.reddit.com/r/AskHistorians/comments/1zmi5t/is_there_any_evidence_that_moors_reached_the/")
+#formatter.download_page("https://www.reddit.com/r/WritingPrompts/comments/35mgnn/wp_a_planet_rotates_once_every_1000_years_so_that/")
 formatter.print_footer()
