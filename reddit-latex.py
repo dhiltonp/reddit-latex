@@ -2,9 +2,7 @@
 
 import praw
 import time
-import pylatex
 import pypandoc
-from time import sleep
 
 time_units = [
     ("month", 60*60*24*30),
@@ -38,13 +36,11 @@ class ThreadFormatter:
                 elif diff > seconds:
                     header += " (edited %d %s after posting)" % (diff//seconds, name)
                     break
-            #header += " ("+time.ctime(comment.edited)+")"
         else:
             header += " -- " + time.strftime("%b %d %Y", time.localtime(comment.created))
 
-        #header += "\n\n"
-        header = pypandoc.convert(header, "tex", format="md")
-        header = "\\mdfsubtitle{"+header+"}\n\n"
+        header = pypandoc.convert(header, "tex", format="md").strip()
+        header = '\n\\hrulefill\\linebreak\\textbf{'+header+'}\n\n'
         return header
 
     def format_comment(self, comment):
@@ -52,13 +48,13 @@ class ThreadFormatter:
             return pypandoc.convert("[deleted]", "tex", format="md")
         text = ""
         text += self.format_comment_header(comment)
-        text += comment.body
-        return pypandoc.convert(text, "tex", format="md")
+        text += pypandoc.convert(comment.body, "tex", format="md")
+        return text
 
     def format_thread(self, comments):
         if len(comments) == 0:
             return ""
-        thread = "\\begin{mdframed}\n"
+        thread = "\\begin{adjustwidth}{.8em}{}\n"
         for comment in comments:
             if type(comment) == "MoreComments":
                 # more comments, but don't bother printing them
@@ -67,7 +63,7 @@ class ThreadFormatter:
             thread += self.format_comment(comment)
             discussion = self.format_thread(comment.replies)
             thread += discussion
-        thread += "\\end{mdframed}\n"
+        thread += "\\end{adjustwidth}\n"
         return thread
 
     def prioritize_comments(self, comments):
@@ -83,8 +79,8 @@ class ThreadFormatter:
     def print_header(self):
         print("""\\documentclass{article}
 \\usepackage{hyperref,color}
-\\usepackage[framemethod=tikz]{mdframed}
-\\usepackage[margin=0.5in]{geometry}
+\\usepackage{changepage}
+\\usepackage[margin=1in]{geometry}
 \\providecommand{\\tightlist}{%
   \\setlength{\\itemsep}{0pt}\\setlength{\\parskip}{0pt}}
 
