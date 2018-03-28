@@ -16,6 +16,8 @@ time_units = [
 
 
 class ThreadFormatter:
+    indent_depth = .8
+        
     def __init__(self):
         self.r = praw.Reddit(user_agent="reddit-latex:v.1")
 
@@ -53,19 +55,22 @@ class ThreadFormatter:
         text += pypandoc.convert(comment.body, "tex", format="md")
         return text
 
-    def format_thread(self, comments):
+    def format_thread(self, comments, depth=1):
         if len(comments) == 0:
             return ""
-        thread = "\\begin{adjustwidth}{.8em}{}\n"
+        indent = self.indent_depth*depth
+        thread = ""
         for comment in comments:
             if type(comment) == "MoreComments":
                 # more comments, but don't bother printing them
                 #  (all interesting comments should have previously been ordered/loaded)
                 continue
+            thread += "\\begin{adjustwidth}{"+str(indent)+"em}{}\n"
             thread += self.format_comment(comment)
-            discussion = self.format_thread(comment.replies)
+            thread += "\\end{adjustwidth}\n"
+            discussion = self.format_thread(comment.replies, depth+1)
             thread += discussion
-        thread += "\\end{adjustwidth}\n"
+        #thread += "\\end{adjustwidth}\n"
         return thread
 
     def prioritize_comments(self, comments):
@@ -102,6 +107,3 @@ if __name__ == "__main__":
     else:
         print("./reddit-latex.py [reddit_comment_urls]")
 
-        #formatter.download_page("https://www.reddit.com/r/LaTeX/comments/3umdyg/latex_formatting_of_reddit_posts/")
-        #formatter.download_page("https://www.reddit.com/r/AskHistorians/comments/1zmi5t/is_there_any_evidence_that_moors_reached_the/")
-        #formatter.download_page("https://www.reddit.com/r/WritingPrompts/comments/35mgnn/wp_a_planet_rotates_once_every_1000_years_so_that/")
