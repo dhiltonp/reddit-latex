@@ -8,7 +8,7 @@ Depends on praw and pypandoc.
 pdflatex latex_formatting.tex
 ```
 
-Sample output: http://filebin.net/c9x2mvhfbv/test2.pdf
+See sample.pdf for output.
 
 
 # requirements
