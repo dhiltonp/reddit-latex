@@ -17,7 +17,7 @@ time_units = [
 
 class ThreadFormatter:
     indent_depth = .8
-        
+
     def __init__(self):
         self.r = praw.Reddit(user_agent="reddit-latex:v.1")
 
@@ -70,7 +70,6 @@ class ThreadFormatter:
             thread += "\\end{adjustwidth}\n"
             discussion = self.format_thread(comment.replies, depth+1)
             thread += discussion
-        #thread += "\\end{adjustwidth}\n"
         return thread
 
     def prioritize_comments(self, comments):
@@ -82,6 +81,7 @@ class ThreadFormatter:
         question = submission.selftext
         print(question)
         print(self.format_thread(submission.comments))
+        print("\pagebreak")
 
     def print_header(self):
         print("""\\documentclass{article}
@@ -97,13 +97,12 @@ class ThreadFormatter:
     def print_footer(self):
         print("""\\end{document}""")
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     if len(sys.argv[1:]) > 0:
         formatter = ThreadFormatter()
         formatter.print_header()
         for page in sys.argv[1:]:
-            formatter.download_page(page)    
+            formatter.download_page(page)
         formatter.print_footer()
     else:
         print("./reddit-latex.py [reddit_comment_urls]")
-
