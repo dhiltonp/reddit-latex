@@ -77,7 +77,7 @@ class ThreadFormatter:
 
     def download_page(self, url):
         submission = self.r.submission(url=url)
-        #submission.replace_more_comments(limit=None, threshold=0)
+        submission.comments.replace_more(limit=None, threshold=0)
         question = submission.selftext
         print(question)
         print(self.format_thread(submission.comments))
