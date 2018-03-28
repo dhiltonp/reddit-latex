@@ -1,7 +1,9 @@
-#!/usr/local/bin/python3
+#!/usr/bin/python3
+
+import time
+import sys
 
 import praw
-import time
 import pypandoc
 
 time_units = [
@@ -70,8 +72,8 @@ class ThreadFormatter:
         pass
 
     def download_page(self, url):
-        submission = self.r.get_submission(url=url)
-        submission.replace_more_comments(limit=None, threshold=0)
+        submission = self.r.submission(url=url)
+        #submission.replace_more_comments(limit=None, threshold=0)
         question = submission.selftext
         print(question)
         print(self.format_thread(submission.comments))
@@ -90,9 +92,16 @@ class ThreadFormatter:
     def print_footer(self):
         print("""\\end{document}""")
 
-formatter = ThreadFormatter()
-formatter.print_header()
-formatter.download_page("https://www.reddit.com/r/LaTeX/comments/3umdyg/latex_formatting_of_reddit_posts/")
-formatter.download_page("https://www.reddit.com/r/AskHistorians/comments/1zmi5t/is_there_any_evidence_that_moors_reached_the/")
-#formatter.download_page("https://www.reddit.com/r/WritingPrompts/comments/35mgnn/wp_a_planet_rotates_once_every_1000_years_so_that/")
-formatter.print_footer()
+if __name__ == "__main__":    
+    if len(sys.argv[1:]) > 0:
+        formatter = ThreadFormatter()
+        formatter.print_header()
+        for page in sys.argv[1:]:
+            formatter.download_page(page)    
+        formatter.print_footer()
+    else:
+        print("./reddit-latex.py [reddit_comment_urls]")
+
+        #formatter.download_page("https://www.reddit.com/r/LaTeX/comments/3umdyg/latex_formatting_of_reddit_posts/")
+        #formatter.download_page("https://www.reddit.com/r/AskHistorians/comments/1zmi5t/is_there_any_evidence_that_moors_reached_the/")
+        #formatter.download_page("https://www.reddit.com/r/WritingPrompts/comments/35mgnn/wp_a_planet_rotates_once_every_1000_years_so_that/")
